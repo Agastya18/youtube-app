@@ -10,7 +10,7 @@ const app = express();
 const PORT= process.env.PORT ;
 
 // database connection
-//connectDB();
+connectDB();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
