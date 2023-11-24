@@ -30,16 +30,18 @@ userSchema.pre("save", async function (next) {
   next();
 })
 
-
+// matching password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 }
 
+// generating token for user
 userSchema.methods.getSignedToken = function () {
   return jwt.sign({ id: this._id  }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   })};
 
+  // generating refresh token for user 
   userSchema.methods.getRefreshToken = function () {
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET_REFRESH, {
       expiresIn: process.env.JWT_EXPIRE_REFRESH,
