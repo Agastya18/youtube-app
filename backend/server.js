@@ -19,7 +19,10 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/', (req, res) => {
     res.send('API is running');
 });
+// routes
+import userRoute from './routes/userRoute.js';
 
+app.use('/api/v1', userRoute);
 
 
 
