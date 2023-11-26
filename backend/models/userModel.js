@@ -9,10 +9,10 @@ const userSchema = new Schema(
 
     password: { type: String, required: true },
 
-    avatar: { type: String, default: "https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg" },
+    avatar: { type: String, required: true},
 
-    coverImage: { type: String, default: "https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg" },
-    refreshToken: { type: String, required: true },
+     coverImage: { type: String, default:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqPq4-8zLfy1e3_Y4GECe-U3MIkvx1AsGNgQ&usqp=CAU"},
+    refreshToken: { type: String },
     watchHistory: [{ type: Schema.Types.ObjectId, ref: "Video" }],
   },
   { timestamps: true }
