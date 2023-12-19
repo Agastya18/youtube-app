@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './database/db.js';
+import cookieParser from 'cookie-parser';
 dotenv.config(
     {
         path: './.env'
@@ -14,6 +15,7 @@ connectDB();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser())
 
 //routes
 app.get('/', (req, res) => {
