@@ -14,8 +14,9 @@ const PORT= process.env.PORT ;
 connectDB();
 //middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser())
+
 
 //routes
 app.get('/', (req, res) => {

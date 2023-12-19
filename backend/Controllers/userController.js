@@ -78,7 +78,7 @@ const loginUser = async(req, res) => {
         const isMatch = await exUser.isPasswordCorrect(password);
 
          
-          console.log(isMatch)
+          
         if(!isMatch){
             return res.status(400).json({message:"Invalid credentials"});
         }
@@ -96,12 +96,13 @@ const loginUser = async(req, res) => {
          
          const option={
                 httpOnly:true,
-                secure :true,
+               
 
                 
          }
-            res.cookie("accessToken",AccessToken,option);
-            res.cookie("refreshToken",refreshToken,option);
+            
+            res.status(200).cookie('accessToken',AccessToken,option)
+            res.cookie('refreshToken',refreshToken,option);
             const loggedInUser = {
                 _id:exUser._id,
                 name:exUser.name,
@@ -127,10 +128,11 @@ const loginUser = async(req, res) => {
 
 }
 const logOut = async(req,res)=>{
-    await User.findByIdAndUpdate(req.user._id,{refreshToken:undefined},{new:true});
-    const option={
+   const disp= await User.findByIdAndUpdate(req.user._id,{refreshToken:null},{new:true});
+  // console.log(disp) 
+   const option={
         httpOnly: true,
-        secure: true
+        
     }
     return res.status(200).clearCookie("accessToken",option).clearCookie("refreshToken",option).json({message:"User logged out successfully"});
 }
