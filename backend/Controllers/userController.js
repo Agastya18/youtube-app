@@ -196,4 +196,12 @@ const changeCurrentPassword = async(req, res) => {
     return res.status(200).json({message:"Password changed successfully"});
 
 }
-export {userRegister,loginUser,logOut,refreshAccessToken}
+
+const getCurrentUser = async(req,res)=>{
+    const CurrentUser = await User.findById(req.user._id);
+    if(!CurrentUser){
+          return res.status(400).json({message:"User does not exist"});
+    }
+    return res.status(200).json({message:"User fetched successfully",CurrentUser});
+}
+export {userRegister,loginUser,logOut,refreshAccessToken,changeCurrentPassword}
