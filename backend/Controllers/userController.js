@@ -176,4 +176,24 @@ const refreshAccessToken = async(req,res)=>{
 
 
 }
+
+const changeCurrentPassword = async(req, res) => {
+    const {oldPassword,newPassword} = req.body;
+
+    if(!oldPassword || !newPassword){
+        return res.status(400).json({message:"Please enter all fields"});
+    }
+   const CurrentUser = await User.findById(req.user._id);
+    if(!CurrentUser){
+          return res.status(400).json({message:"User does not exist"});
+    }
+    const isValid = await CurrentUser.isPasswordCorrect(oldPassword);
+    if(!isValid){
+        return res.status(400).json({message:"Invalid old credentials"});
+    }
+    CurrentUser.password = newPassword;
+    await CurrentUser.save({validateBeforeSave:false});
+    return res.status(200).json({message:"Password changed successfully"});
+
+}
 export {userRegister,loginUser,logOut,refreshAccessToken}
