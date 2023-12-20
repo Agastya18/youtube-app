@@ -151,18 +151,21 @@ const refreshAccessToken = async(req,res)=>{
      if(!useR){
          return res.status(400).json({message:"Please login again"});
      }
+     
      if(useR.refreshToken !== incomingRefreshToken){
          return res.status(400).json({message:"Please login again"});
      }
      const newAccessToken = useR.getAccessToken();
-     const newRefreshToken = newAccessToken.getRefreshToken();
+     const newRefreshToken = useR.getRefreshToken();
      if(!newAccessToken){
          return res.status(400).json({message:"Please login again"});
+     }
+     if(!newRefreshToken){
+            return res.status(400).json({message:"Please login again"});
      }
      const option ={
          httpOnly:true,
          
-     
      }
      res.cookie("accessToken",newAccessToken,option);
      res.cookie("refreshToken",newRefreshToken,option);
