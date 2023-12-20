@@ -204,4 +204,19 @@ const getCurrentUser = async(req,res)=>{
     }
     return res.status(200).json({message:"User fetched successfully",CurrentUser});
 }
+
+const updateAccountDetails = async(req,res)=>{
+    const {name,email} = req.body;
+    if(!name || !email){
+        return res.status(400).json({message:"Please enter all fields"});
+    }
+    const currentUser = await User.findByIdAndUpdate(req.user._id,{ $set:{
+        name:name,email:email
+    }},{new:true}).select("-password");
+    if(!currentUser){
+        return res.status(400).json({message:"User does not exist"});
+    }
+    return res.status(200).json({message:"User Account details updated successfully",currentUser})
+
+}
 export {userRegister,loginUser,logOut,refreshAccessToken,changeCurrentPassword}
