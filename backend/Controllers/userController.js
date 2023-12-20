@@ -1,7 +1,7 @@
 import {User} from "../models/userModel.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
-import bcrypt from "bcryptjs"
 
+import jwt from "jsonwebtoken";
 const userRegister = async(req,res)=>{
     // res.status(404).json({message:"Register route"});
     const {name,email,password} = req.body;
@@ -136,4 +136,41 @@ const logOut = async(req,res)=>{
     }
     return res.status(200).clearCookie("accessToken",option).clearCookie("refreshToken",option).json({message:"User logged out successfully"});
 }
-export {userRegister,loginUser,logOut}
+
+const refreshAccessToken = async(req,res)=>{
+  const incomingRefreshToken = req.cookies.refreshToken;
+    if(!incomingRefreshToken){
+        return res.status(400).json({message:"Please login again"});
+    }
+   try {
+     const decoded = jwt.verify(incomingRefreshToken,process.env.JWT_SECRET_REFRESH);
+     if(!decoded){
+         return res.status(400).json({message:"Please login again"});
+     }
+     const useR = await User.findById(decoded.id);
+     if(!useR){
+         return res.status(400).json({message:"Please login again"});
+     }
+     if(useR.refreshToken !== incomingRefreshToken){
+         return res.status(400).json({message:"Please login again"});
+     }
+     const newAccessToken = useR.getAccessToken();
+     const newRefreshToken = newAccessToken.getRefreshToken();
+     if(!newAccessToken){
+         return res.status(400).json({message:"Please login again"});
+     }
+     const option ={
+         httpOnly:true,
+         
+     
+     }
+     res.cookie("accessToken",newAccessToken,option);
+     res.cookie("refreshToken",newRefreshToken,option);
+     return res.status(200).json({message:"Access token refreshed successfully",newAccessToken,newRefreshToken});
+   } catch (error) {
+    console.log(error);
+   }
+
+
+}
+export {userRegister,loginUser,logOut,refreshAccessToken}
