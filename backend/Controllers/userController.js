@@ -1,6 +1,5 @@
 import {User} from "../models/userModel.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
-
 import jwt from "jsonwebtoken";
 const userRegister = async(req,res)=>{
     // res.status(404).json({message:"Register route"});
@@ -219,4 +218,28 @@ const updateAccountDetails = async(req,res)=>{
     return res.status(200).json({message:"User Account details updated successfully",currentUser})
 
 }
-export {userRegister,loginUser,logOut,refreshAccessToken,changeCurrentPassword}
+const updateUserAvatar = async(req,res)=>{
+    const avatarLocal=  req.file.path
+    if(!avatarLocal){
+        return res.status(400).json({message:"Please upload avatar"});
+    }
+    const avatar= await uploadOnCloudinary(avatarLocal);
+    if(!avatar.url){
+        return res.status(400).json({message:"Error uploading avatar"});
+    }
+    const currentUser = await User.findByIdAndUpdate(req.user._id,{ $set:{
+        avatar:avatar.url
+    }},{new:true}).select("-password");
+    if(!currentUser){
+        return res.status(400).json({message:"User does not exist"});
+    }
+    return res.status(200).json({message:"User Avatar updated successfully",currentUser})
+
+}
+export {userRegister,
+    loginUser,
+    logOut,
+    refreshAccessToken,
+    changeCurrentPassword,
+    updateUserAvatar,
+}
