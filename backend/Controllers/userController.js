@@ -236,10 +236,76 @@ const updateUserAvatar = async(req,res)=>{
     return res.status(200).json({message:"User Avatar updated successfully",currentUser})
 
 }
+const getUserChennalProfile =async(req,res)=>{
+    const {name} = req.params;
+    if(!name?.trim()){
+        return res.status(400).json({message:"Please enter all fields"});
+    }
+    const channel = await User.aggregate([
+        {
+            $match:{
+                name:name
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"channel",
+                as:"subscribers"
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"subscriber",
+                as:"subscribedTo"
+            }
+        },
+        {
+            $addFields:{
+                subscribersCount:{$size:"$subscribers"},
+                subscribedToCount:{$size:"$subscribedTo"},
+                isSubscribed:{
+                    $cond:{
+                       if:{$in:[req.user._id,"$subscribers.subscriber"]},
+                          then:true,
+                          else:false
+                    }
+                }
+            }
+        },
+        {
+            $project:{
+                
+                subscribersCount:1,
+                subscribedToCount:1,
+                isSubscribed:1,
+                name:1,
+                avatar:1,
+                coverImage:1,
+                createdAt:1,
+
+
+            }
+        
+        }
+    ])
+    console.log(channel) // important
+    if(!channel?.length){
+        return res.status(400).json({message:"Channel does not exist"});
+    }
+    return res.status(200).json({message:"Channel fetched successfully",channel:channel[0]})
+
+    
+
+}
 export {userRegister,
     loginUser,
     logOut,
     refreshAccessToken,
     changeCurrentPassword,
     updateUserAvatar,
+    getUserChennalProfile,
 }
