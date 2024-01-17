@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {User} from "../models/userModel.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
@@ -301,6 +302,55 @@ const getUserChennalProfile =async(req,res)=>{
     
 
 }
+const getWatchHistory = async(req,res)=>{
+    const user = User.aggregate([
+        {
+            $match:{
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner",
+                            pipeline:[
+                                {
+                                    $project:{
+                                        name:1,
+                                        avatar:1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields:{
+                            owner:{
+                                $first:"$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    if(!user?.length){
+        return res.status(400).json({message:"User does not exist"});
+    }
+    return res.status(200).json({message:"Watch history fetched successfully",watchHistory:user[0].watchHistory})
+
+
+}
 export {userRegister,
     loginUser,
     logOut,
@@ -308,4 +358,5 @@ export {userRegister,
     changeCurrentPassword,
     updateUserAvatar,
     getUserChennalProfile,
+    getWatchHistory,
 }

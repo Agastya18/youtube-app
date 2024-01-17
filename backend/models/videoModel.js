@@ -13,7 +13,7 @@ const videoSchema = new mongoose.Schema({
 
     duration:{type:Number,required:true},
     
-    uploadedBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
+    owner:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
 
     isPublished:{type:Boolean,default:true},
 
